@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f8fc">
+    <meta name="description" content="Practice job interviews with structured questions and clear, honest feedback.">
+    <title>InterviewBuddy AI — Practice with purpose</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="js/question-bank.js" defer></script>
+    <script src="js/feedback.js" defer></script>
+    <script src="js/app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#" data-action="home" aria-label="InterviewBuddy AI home">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span>interviewbuddy<span class="brand-ai">.ai</span></span>
+      </a>
+      <nav class="top-nav" aria-label="Main navigation">
+        <a href="#how-it-works" data-action="how-it-works">How it works</a>
+        <button class="button button-small button-outline" type="button" data-action="dashboard">My practice</button>
+      </nav>
+    </header>
+
+    <main id="main-content">
+      <section class="view landing-view" id="landing-view" aria-labelledby="hero-title">
+        <div class="hero">
+          <div class="hero-copy">
+            <span class="eyebrow"><span class="eyebrow-dot"></span> YOUR NEXT OPPORTUNITY STARTS HERE</span>
+            <h1 id="hero-title">Show up ready.<br><span>Make it count.</span></h1>
+            <p class="hero-description">Build interview confidence one thoughtful answer at a time. Practice real questions and get clear guidance on what to improve.</p>
+            <div class="hero-actions">
+              <button class="button button-primary" type="button" data-action="dashboard">Start practicing <span aria-hidden="true">→</span></button>
+              <a class="text-link" href="#how-it-works" data-action="how-it-works">See how it works <span aria-hidden="true">↓</span></a>
+            </div>
+            <div class="hero-note"><span class="check-icon" aria-hidden="true">✓</span> Free to try <span class="note-divider">·</span> No account needed <span class="note-divider">·</span> Private by design</div>
+          </div>
+          <div class="hero-visual" aria-label="A preview of a practice interview question">
+            <div class="visual-orbit orbit-one"></div>
+            <div class="visual-orbit orbit-two"></div>
+            <div class="question-preview">
+              <div class="preview-top"><span class="preview-label"><span class="live-dot"></span> PRACTICE QUESTION</span><span class="preview-number">01 / 05</span></div>
+              <div class="preview-icon" aria-hidden="true">✳</div>
+              <p class="preview-question">“Tell me about a time you overcame a challenge.”</p>
+              <div class="preview-divider"></div>
+              <div class="preview-tip"><span class="tip-sparkle" aria-hidden="true">✦</span><span><strong>A little structure goes a long way.</strong><br>Try the STAR framework to keep your story focused.</span></div>
+              <div class="preview-progress"><span></span></div>
+            </div>
+            <div class="floating-note note-top"><span class="float-icon">✦</span> One question at a time</div>
+            <div class="floating-note note-bottom"><span class="float-check">✓</span> Your practice, your pace</div>
+          </div>
+        </div>
+        <section class="how-section" id="how-it-works">
+          <div class="section-heading">
+            <span class="eyebrow">A SIMPLE WAY TO GET BETTER</span>
+            <h2>Practice with a little more purpose.</h2>
+            <p>Less guessing. More useful reps before the real conversation.</p>
+          </div>
+          <div class="steps-grid">
+            <article class="step-card"><span class="step-number">01</span><div class="step-icon icon-lilac" aria-hidden="true">⌘</div><h3>Make it yours</h3><p>Choose a role, experience level, interview style, and difficulty.</p></article>
+            <article class="step-card"><span class="step-number">02</span><div class="step-icon icon-peach" aria-hidden="true">✎</div><h3>Work through questions</h3><p>Answer one relevant prompt at a time, at your own pace.</p></article>
+            <article class="step-card"><span class="step-number">03</span><div class="step-icon icon-mint" aria-hidden="true">↗</div><h3>Leave with a next step</h3><p>Get transparent demo feedback and a focused practice plan.</p></article>
+          </div>
+        </section>
+      </section>
+
+      <section class="view app-view" id="dashboard-view" hidden aria-labelledby="dashboard-title">
+        <div class="app-container dashboard-container">
+          <button class="back-link" type="button" data-action="home"><span aria-hidden="true">←</span> Home</button>
+          <div class="dashboard-heading">
+            <div><span class="eyebrow">YOUR PRACTICE SPACE</span><h1 id="dashboard-title" tabindex="-1">A little practice goes a long way.</h1><p>Choose a session to get started. No pressure—just progress.</p></div>
+            <div class="dashboard-stamp" aria-hidden="true"><span>✳</span></div>
+          </div>
+          <div class="session-cards">
+            <article class="session-card session-card-featured">
+              <div class="session-card-top"><span class="session-icon session-icon-purple" aria-hidden="true">✧</span><span class="session-tag">A GOOD PLACE TO START</span></div>
+              <h2>Start an interview</h2><p>Build a session around your next opportunity. Choose your role, interview type, and challenge level.</p>
+              <button class="button button-primary" type="button" data-action="start-interview">Set up my interview <span aria-hidden="true">→</span></button>
+            </article>
+            <article class="session-card">
+              <div class="session-card-top"><span class="session-icon session-icon-orange" aria-hidden="true">✎</span><span class="session-tag">FOCUSED PRACTICE</span></div>
+              <h2>Practice a skill</h2><p>Get comfortable with behavioral questions and learn to tell clearer stories with the STAR framework.</p>
+              <button class="button button-secondary" type="button" data-action="practice">Practice behavioral <span aria-hidden="true">→</span></button>
+            </article>
+          </div>
+          <aside class="honesty-note"><span class="honesty-icon" aria-hidden="true">i</span><p><strong>Honest feedback, by design.</strong> This demo uses a transparent checklist—not an AI model. Your answers stay in this browser session and are not sent anywhere.</p></aside>
+        </div>
+      </section>
+
+      <section class="view app-view" id="setup-view" hidden aria-labelledby="setup-title">
+        <div class="app-container narrow-container">
+          <button class="back-link" type="button" data-action="dashboard"><span aria-hidden="true">←</span> Back to practice</button>
+          <div class="setup-heading"><span class="eyebrow">LET'S MAKE THIS RELEVANT</span><h1 id="setup-title" tabindex="-1">Set up your interview.</h1><p>Pick the options that feel closest to your next interview.</p></div>
+          <form class="setup-card" id="setup-form">
+            <label class="field"><span>Job role</span><select name="role" required><option value="software">Software engineer</option><option value="data">Data analyst</option><option value="product">Product manager</option><option value="customer">Customer support</option></select></label>
+            <label class="field"><span>Experience level</span><select name="experience" required><option value="student">Student / recent graduate</option><option value="entry">Early career (1–3 years)</option><option value="experienced">Experienced (4+ years)</option></select></label>
+            <fieldset class="field fieldset"><legend>Interview type</legend><div class="choice-grid">
+              <label class="choice-card"><input type="radio" name="type" value="mixed" checked><span class="choice-content"><span class="choice-emoji" aria-hidden="true">◈</span><strong>Mixed</strong><small>A bit of everything</small></span></label>
+              <label class="choice-card"><input type="radio" name="type" value="behavioral"><span class="choice-content"><span class="choice-emoji" aria-hidden="true">↗</span><strong>Behavioral</strong><small>Stories &amp; examples</small></span></label>
+              <label class="choice-card"><input type="radio" name="type" value="technical"><span class="choice-content"><span class="choice-emoji" aria-hidden="true">⌘</span><strong>Technical</strong><small>Role-related skills</small></span></label>
+            </div></fieldset>
+            <label class="field"><span>Difficulty</span><select name="difficulty" required><option value="friendly">Warm-up</option><option value="standard" selected>Interview-ready</option><option value="challenging">Stretch yourself</option></select></label>
+            <p class="form-error" id="setup-error" role="alert" hidden></p>
+            <button class="button button-primary button-full" type="submit">Build my practice session <span aria-hidden="true">→</span></button>
+            <p class="form-footnote">About 5 questions · Take a break whenever you need</p>
+          </form>
+        </div>
+      </section>
+
+      <section class="view app-view" id="interview-view" hidden aria-labelledby="question-title">
+        <div class="app-container interview-container">
+          <div class="interview-topbar"><button class="back-link" type="button" data-action="dashboard"><span aria-hidden="true">×</span> End session</button><span class="session-meta" id="session-meta"></span></div>
+          <div class="progress-header"><div><span class="eyebrow" id="question-category"></span><p class="progress-label" id="progress-label"></p></div><span class="progress-count" id="progress-count"></span></div>
+          <div class="progress-track" role="progressbar" aria-label="Interview progress" aria-valuemin="0" aria-valuemax="5" aria-valuenow="1"><span id="progress-fill"></span></div>
+          <div class="question-card">
+            <div class="question-symbol" aria-hidden="true">✳</div>
+            <h1 id="question-title" tabindex="-1"></h1>
+            <p class="question-context" id="question-context"></p>
+            <div class="answer-hint" id="answer-hint"></div>
+            <form id="answer-form">
+              <label class="visually-hidden" for="answer-input">Your answer</label>
+              <textarea id="answer-input" name="answer" rows="8" placeholder="Take a moment to think, then write your answer here..." required></textarea>
+              <div class="answer-footer"><span id="answer-counter">0 characters</span><span>Tip: specific examples make stronger answers.</span></div>
+              <p class="form-error" id="answer-error" role="alert" hidden></p>
+              <div class="answer-actions"><button class="button button-primary" id="submit-answer" type="submit">Get feedback <span aria-hidden="true">→</span></button><span class="privacy-caption"><span aria-hidden="true">🔒</span> Your answer stays on this device</span></div>
+            </form>
+          </div>
+          <section class="feedback-card" id="feedback-panel" hidden aria-live="polite" aria-labelledby="feedback-title">
+            <div class="feedback-heading"><span class="feedback-badge" aria-hidden="true">✦</span><div><h2 id="feedback-title">A few thoughts on your answer</h2><p>Checklist-based demo feedback · Not AI-generated</p></div></div>
+            <div class="feedback-grid"><div><h3>What’s working</h3><ul id="feedback-strengths"></ul></div><div><h3>Consider adding</h3><ul id="feedback-gaps"></ul></div></div>
+            <div class="improve-box"><strong>Try this next</strong><p id="feedback-suggestion"></p></div>
+            <div class="feedback-actions"><button class="button button-outline" type="button" data-action="retry-answer">Try this answer again</button><button class="button button-primary" id="continue-button" type="button">Continue <span aria-hidden="true">→</span></button></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="view app-view" id="report-view" hidden aria-labelledby="report-title">
+        <div class="app-container report-container">
+          <div class="report-hero"><span class="report-check" aria-hidden="true">✓</span><span class="eyebrow">PRACTICE SESSION COMPLETE</span><h1 id="report-title" tabindex="-1">You showed up. That counts.</h1><p id="report-summary"></p></div>
+          <div class="report-score-card"><div class="score-display"><span class="score-label">DEMO RUBRIC SCORE</span><div><strong id="score-value">0</strong><span class="score-out-of">/ 100</span></div><span class="score-caption">A practice guide, not a hiring prediction</span></div><div class="score-breakdown" id="score-breakdown"></div></div>
+          <div class="report-columns"><section class="report-panel"><h2>Your strengths</h2><ul id="report-strengths"></ul></section><section class="report-panel"><h2>Room to grow</h2><ul id="report-improvements"></ul></section></div>
+          <section class="report-panel next-steps-panel"><span class="eyebrow">YOUR NEXT PRACTICE</span><h2>Keep the momentum going.</h2><div id="recommended-topics" class="topic-list"></div></section>
+          <details class="rubric-details"><summary>How is this score calculated?</summary><p>Each answer is reviewed using the same simple checklist: answer development (0–30), relevant specifics or evidence (0–25), clear structure (0–25), and a useful outcome or takeaway (0–20). Behavioral answers are checked for Situation, Task, Action, and Result. Technical answers are checked for problem understanding, approach, and trade-offs. This is deterministic demo feedback—not AI, a hiring assessment, or a prediction of interview success.</p></details>
+          <div class="report-actions"><button class="button button-primary" type="button" data-action="retry-interview">Practice these questions again <span aria-hidden="true">↻</span></button><button class="button button-outline" type="button" data-action="dashboard">Back to practice</button></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><a class="brand footer-brand" href="#" data-action="home"><span class="brand-mark" aria-hidden="true">ib</span><span>interviewbuddy<span class="brand-ai">.ai</span></span></a><span>Practice makes progress. You’ve got this.</span></footer>
+  </body>
+</html>
