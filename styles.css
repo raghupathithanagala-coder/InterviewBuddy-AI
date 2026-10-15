@@ -1,17 +1,19 @@
+
 :root {
-  color-scheme: light;
-  --ink: #232336;
-  --muted: #77788a;
-  --purple: #7157d9;
-  --purple-dark: #5c43c4;
-  --lavender: #f0edff;
-  --paper: #fff;
-  --canvas: #f8f8fc;
-  --line: #e9e8f0;
-  --mint: #e7f6ef;
-  --orange: #f5a65b;
-  --shadow: 0 18px 60px rgba(38, 31, 83, .08);
+  color-scheme: dark;
+  --ink: #f1f5f9;
+  --muted: #cbd5e1;
+  --purple: #8b5cf6;
+  --purple-dark: #a78bfa;
+  --lavender: #312e81;
+  --paper: #1e293b;
+  --canvas: #0f172a;
+  --line: #334155;
+  --mint: #134e4a;
+  --orange: #fbbf24;
+  --shadow: 0 18px 60px rgba(0, 0, 0, .3);
 }
+
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
