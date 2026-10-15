@@ -33,6 +33,9 @@
       "dest": "js/app.py"
     },
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
       "dest": "index.html"
     }
