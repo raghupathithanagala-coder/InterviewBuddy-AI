@@ -2,6 +2,21 @@
   "use strict";
 
   const QUESTION_COUNT = 5;
+  const ROLE_NAMES = {
+    software: "Software Developer",
+    web: "Web Developer",
+    data: "Data Analyst",
+    ai_ml: "AI/ML Engineer",
+    electronics: "Electronics Engineer",
+    embedded: "Embedded Systems Engineer",
+    communications: "Communication Engineer",
+    hr: "HR/Behavioral Interview"
+  };
+  const configuredApiBase = document.querySelector('meta[name="api-base-url"]').content.trim().replace(/\/+$/, "");
+  const localApiBase = ["localhost", "127.0.0.1"].indexOf(window.location.hostname) >= 0
+    ? "http://127.0.0.1:5000"
+    : "";
+  const API_BASE_URL = configuredApiBase || localApiBase;
   const views = {
     landing: document.getElementById("landing-view"),
     dashboard: document.getElementById("dashboard-view"),
@@ -15,7 +30,10 @@
     questions: [],
     answers: [],
     index: 0,
-    currentFeedback: null
+    currentFeedback: null,
+    activeQuestion: null,
+    activeIsFollowUp: false,
+    previousTurn: null
   };
 
   document.addEventListener("click", handleAction);
@@ -23,6 +41,7 @@
   document.getElementById("answer-form").addEventListener("submit", submitAnswer);
   document.getElementById("answer-input").addEventListener("input", updateAnswerCounter);
   document.getElementById("continue-button").addEventListener("click", continueSession);
+  document.getElementById("answer-follow-up").addEventListener("click", answerFollowUp);
 
   function showView(name, focusSelector) {
     if (!views[name]) {
@@ -60,7 +79,8 @@
     } else if (action === "start-interview") {
       showView("setup", "#setup-title");
     } else if (action === "practice") {
-      document.querySelector('input[name="type"][value="behavioral"]').checked = true;
+      document.querySelector('input[name="type"][value="mixed"]').checked = true;
+      document.querySelector('select[name="difficulty"]').value = "friendly";
       showView("setup", "#setup-title");
     } else if (action === "retry-answer") {
       retryCurrentAnswer();
@@ -80,7 +100,7 @@
       difficulty: data.get("difficulty")
     };
     const error = document.getElementById("setup-error");
-    const validRoles = ["software", "data", "product", "customer"];
+    const validRoles = Object.keys(ROLE_NAMES);
     const validTypes = ["mixed", "behavioral", "technical"];
     const validDifficulties = ["friendly", "standard", "challenging"];
     if (validRoles.indexOf(options.role) < 0 || validTypes.indexOf(options.type) < 0 || validDifficulties.indexOf(options.difficulty) < 0) {
@@ -92,42 +112,81 @@
     beginSession(options);
   }
 
-  function beginSession(options) {
-    const questions = window.InterviewQuestionBank.selectQuestions(options, QUESTION_COUNT);
-    if (questions.length !== QUESTION_COUNT) {
-      const error = document.getElementById("setup-error");
-      error.textContent = "We couldn't build a complete question set. Please try a different interview type.";
+  async function beginSession(options) {
+    const error = document.getElementById("setup-error");
+    const buildButton = document.getElementById("build-session");
+    error.hidden = true;
+    buildButton.disabled = true;
+    buildButton.textContent = "Generating questions with Gemini...";
+    try {
+      const result = await requestApi("/api/questions", options);
+      if (!result || !Array.isArray(result.questions) || result.questions.length !== QUESTION_COUNT
+        || !result.questions.every(function (question) {
+          return question && typeof question.question === "string" && question.question.trim()
+            && typeof question.context === "string" && typeof question.topic === "string"
+            && (question.category === "behavioral" || question.category === "technical")
+            && ["warmup", "standard", "stretch"].indexOf(question.stage) >= 0;
+        })) {
+        throw new Error("Gemini did not return a complete question set. Please try again.");
+      }
+      state.options = Object.assign({}, options);
+      state.questions = result.questions.map(function (question) {
+        return {
+          prompt: question.question,
+          context: question.context,
+          category: question.category,
+          topic: question.topic,
+          stage: question.stage
+        };
+      });
+      state.answers = [];
+      state.index = 0;
+      state.currentFeedback = null;
+      state.previousTurn = null;
+      state.activeIsFollowUp = false;
+      state.activeQuestion = null;
+      renderQuestion();
+      showView("interview", "#question-title");
+    } catch (requestError) {
+      error.textContent = requestError instanceof TypeError
+        ? connectionMessage()
+        : requestError.message;
       error.hidden = false;
-      showView("setup");
-      return;
+      showView("setup", "#setup-title");
+    } finally {
+      buildButton.disabled = false;
+      buildButton.innerHTML = "Generate AI questions <span aria-hidden=\"true\">→</span>";
     }
-    state.options = Object.assign({}, options);
-    state.questions = questions;
-    state.answers = [];
-    state.index = 0;
-    state.currentFeedback = null;
-    renderQuestion();
-    showView("interview", "#question-title");
   }
 
   function renderQuestion() {
-    const question = state.questions[state.index];
+    const question = state.activeQuestion || state.questions[state.index];
+    state.activeQuestion = question;
     const isBehavioral = question.category === "behavioral";
     const progress = Math.round(((state.index + 1) / state.questions.length) * 100);
-    document.getElementById("session-meta").textContent = window.InterviewQuestionBank.roleNames[state.options.role] + " · " + experienceLabel(state.options.experience);
-    document.getElementById("question-category").textContent = isBehavioral ? "BEHAVIORAL QUESTION" : "ROLE-RELATED QUESTION";
-    document.getElementById("progress-label").textContent = isBehavioral ? "A real example helps tell your story." : "Talk through your thinking out loud.";
-    document.getElementById("progress-count").textContent = "Question " + (state.index + 1) + " of " + state.questions.length;
+    document.getElementById("session-meta").textContent = ROLE_NAMES[state.options.role] + " · " + experienceLabel(state.options.experience);
+    document.getElementById("question-category").textContent = state.activeIsFollowUp
+      ? "PERSONALIZED FOLLOW-UP"
+      : (isBehavioral ? "BEHAVIORAL QUESTION" : "ROLE-RELATED QUESTION")
+        + " · " + question.stage.toUpperCase();
+    document.getElementById("progress-label").textContent = state.activeIsFollowUp
+      ? "Build on your last answer; this follow-up is based on what you shared."
+      : state.index === 0
+        ? "Start with the warm-up. The questions gradually build in challenge."
+        : isBehavioral ? "A real example helps tell your story." : "Talk through your thinking out loud.";
+    document.getElementById("progress-count").textContent = "Question " + (state.index + 1) + " of " + state.questions.length
+      + (state.activeIsFollowUp ? " · follow-up" : "");
     document.getElementById("question-title").textContent = question.prompt;
     document.getElementById("question-context").textContent = question.context;
     document.getElementById("answer-hint").innerHTML = isBehavioral
-      ? "<strong>Try STAR:</strong> Situation · Task · Action · Result"
-      : "<strong>Try this structure:</strong> Understand the problem · Explain your approach · Share a trade-off or check";
+      ? "<strong>Take it one step at a time:</strong> Situation · Task · Action · Result"
+      : "<strong>Take it one step at a time:</strong> Clarify the problem · Explain your approach · Share a trade-off or check";
     document.getElementById("answer-input").value = "";
     document.getElementById("answer-input").disabled = false;
     document.getElementById("answer-error").hidden = true;
     document.getElementById("feedback-panel").hidden = true;
     document.getElementById("answer-form").hidden = false;
+    document.getElementById("answer-follow-up").hidden = true;
     const progressBar = document.querySelector(".progress-track");
     progressBar.setAttribute("aria-valuenow", String(state.index + 1));
     progressBar.setAttribute("aria-valuemax", String(state.questions.length));
@@ -147,7 +206,7 @@
       return;
     }
     if (answer.length < 20) {
-      error.textContent = "Add a little more detail (at least 20 characters) so the checklist can give you useful feedback.";
+      error.textContent = "Add a little more detail (at least 20 characters) so Gemini can evaluate your answer.";
       error.hidden = false;
       input.focus();
       return;
@@ -161,56 +220,49 @@
     const submitButton = document.getElementById("submit-answer");
     const error = document.getElementById("answer-error");
     const originalButtonContent = submitButton.innerHTML;
-    const question = state.questions[state.index].prompt;
+    const question = state.activeQuestion;
 
     submitButton.disabled = true;
-    submitButton.textContent = "Getting feedback...";
+    submitButton.textContent = "Gemini is evaluating...";
     input.disabled = true;
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: question, answer: answer })
+      const feedback = await requestApi("/api/feedback", {
+        role: state.options.role,
+        experience: state.options.experience,
+        question: question.prompt,
+        answer: answer,
+        previous_question: state.previousTurn ? state.previousTurn.question : "",
+        previous_answer: state.previousTurn ? state.previousTurn.answer : "",
+        is_follow_up: state.activeIsFollowUp
       });
-      let feedback;
-      try {
-        feedback = await response.json();
-      } catch (parseError) {
-        feedback = null;
-      }
-
-      if (!response.ok) {
-        throw new Error(feedback && typeof feedback.error === "string"
-          ? feedback.error
-          : "The feedback service couldn't process your answer. Please try again.");
-      }
       if (
         !feedback
+        || !Number.isInteger(feedback.score)
+        || feedback.score < 0
+        || feedback.score > 100
         || !Array.isArray(feedback.strengths)
         || !feedback.strengths.every(function (item) { return typeof item === "string"; })
-        || !Array.isArray(feedback.improvements)
-        || !feedback.improvements.every(function (item) { return typeof item === "string"; })
-        || typeof feedback.sample_improved_answer !== "string"
-        || !feedback.sample_improved_answer.trim()
+        || !Array.isArray(feedback.weaknesses)
+        || !feedback.weaknesses.every(function (item) { return typeof item === "string"; })
+        || !Array.isArray(feedback.missing_concepts)
+        || !feedback.missing_concepts.every(function (item) { return typeof item === "string"; })
+        || !Array.isArray(feedback.grammar_suggestions)
+        || !feedback.grammar_suggestions.every(function (item) { return typeof item === "string"; })
+        || typeof feedback.clarity_feedback !== "string"
+        || typeof feedback.relevance_feedback !== "string"
+        || typeof feedback.improved_answer !== "string"
+        || !feedback.improved_answer.trim()
+        || typeof feedback.follow_up_question !== "string"
+        || !feedback.follow_up_question.trim()
       ) {
-        throw new Error("The feedback service returned an unexpected response. Please try again.");
+        throw new Error("Gemini returned incomplete feedback. Please try again.");
       }
-
-      const rubric = window.InterviewFeedback.analyze(answer, state.questions[state.index].category);
-      const result = {
-        score: rubric.score,
-        wordCount: rubric.wordCount,
-        signals: rubric.signals,
-        strengths: feedback.strengths,
-        gaps: feedback.improvements,
-        suggestion: feedback.sample_improved_answer
-      };
-      state.currentFeedback = { answer: answer, result: result };
-      renderFeedback(result);
+      state.currentFeedback = { answer: answer, result: feedback };
+      renderFeedback(feedback);
     } catch (requestError) {
       error.textContent = requestError instanceof TypeError
-        ? "We couldn't reach the feedback service. Make sure the Flask backend is running at http://127.0.0.1:5000, then try again."
+        ? connectionMessage()
         : requestError.message;
       error.hidden = false;
       input.disabled = false;
@@ -220,25 +272,54 @@
     }
   }
 
+  async function requestApi(path, payload) {
+    const response = await fetch(API_BASE_URL + path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    let result;
+    try {
+      result = await response.json();
+    } catch (parseError) {
+      result = null;
+    }
+    if (!response.ok) {
+      throw new Error(result && typeof result.error === "string"
+        ? result.error
+        : "The interview service returned an error (" + response.status + "). Please try again.");
+    }
+    return result;
+  }
+
+  function connectionMessage() {
+    return API_BASE_URL
+      ? "We couldn't reach the interview service at " + API_BASE_URL + ". Check that the Flask backend is running, then try again."
+      : "We couldn't reach the interview service. Check the configured API base URL and backend, then try again.";
+  }
+
   function renderFeedback(result) {
-    document.querySelector("#feedback-title + p").textContent = "Gemini-generated interview-practice feedback";
-    document.getElementById("feedback-strengths").replaceChildren.apply(
-      document.getElementById("feedback-strengths"),
-      result.strengths.map(createListItem)
-    );
-    document.getElementById("feedback-gaps").replaceChildren.apply(
-      document.getElementById("feedback-gaps"),
-      result.gaps.map(createListItem)
-    );
-    document.getElementById("feedback-suggestion").textContent = result.suggestion;
+    document.getElementById("answer-score").textContent = result.score + " / 100";
+    setList("feedback-strengths", result.strengths, "Gemini did not identify any strengths.");
+    setList("feedback-weaknesses", result.weaknesses, "Gemini did not identify specific weaknesses.");
+    setList("feedback-missing", result.missing_concepts, "Gemini did not identify missing concepts.");
+    setList("feedback-grammar", result.grammar_suggestions, "No grammar changes suggested.");
+    document.getElementById("feedback-clarity").textContent = result.clarity_feedback;
+    document.getElementById("feedback-relevance").textContent = result.relevance_feedback;
+    document.getElementById("feedback-improved").textContent = result.improved_answer;
+    document.getElementById("follow-up-question").textContent = result.follow_up_question;
+    document.getElementById("follow-up-box").hidden = state.activeIsFollowUp;
+    document.getElementById("answer-follow-up").hidden = state.activeIsFollowUp;
     document.getElementById("answer-input").disabled = true;
     document.getElementById("feedback-panel").hidden = false;
-    document.getElementById("continue-button").textContent = state.index === state.questions.length - 1 ? "See my report →" : "Continue →";
+    document.getElementById("continue-button").textContent = state.index === state.questions.length - 1
+      ? "Finish session →"
+      : "Next question →";
     document.getElementById("feedback-panel").scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   function retryCurrentAnswer() {
-    if (state.currentFeedback) state.currentFeedback = null;
+    state.currentFeedback = null;
     document.getElementById("feedback-panel").hidden = true;
     document.getElementById("answer-form").hidden = false;
     const answerInput = document.getElementById("answer-input");
@@ -248,16 +329,54 @@
     answerInput.focus();
   }
 
-  function continueSession() {
+  function saveCurrentAnswer() {
     if (!state.currentFeedback) return;
-    state.answers[state.index] = {
-      question: state.questions[state.index],
+    state.answers.push({
+      question: state.activeQuestion,
       answer: state.currentFeedback.answer,
-      feedback: state.currentFeedback.result
+      feedback: state.currentFeedback.result,
+      isFollowUp: state.activeIsFollowUp
+    });
+    state.previousTurn = {
+      question: state.activeQuestion.prompt,
+      answer: state.currentFeedback.answer
     };
     state.currentFeedback = null;
-    if (state.index + 1 < state.questions.length) {
+  }
+
+  function answerFollowUp() {
+    if (!state.currentFeedback || !state.currentFeedback.result.follow_up_question) return;
+    const followUp = state.currentFeedback.result.follow_up_question;
+    const parentQuestion = state.activeQuestion;
+    saveCurrentAnswer();
+    state.activeIsFollowUp = true;
+    state.activeQuestion = {
+      prompt: followUp,
+      context: "Use your previous answer as a starting point.",
+      category: parentQuestion.category,
+      topic: parentQuestion.topic,
+      stage: parentQuestion.stage
+    };
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.getElementById("question-title").focus();
+  }
+
+  function continueSession() {
+    if (!state.currentFeedback) return;
+    const wasFollowUp = state.activeIsFollowUp;
+    saveCurrentAnswer();
+    if (!wasFollowUp && state.index + 1 < state.questions.length) {
       state.index += 1;
+      state.activeIsFollowUp = false;
+      state.activeQuestion = null;
+      renderQuestion();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      document.getElementById("question-title").focus();
+    } else if (wasFollowUp && state.index + 1 < state.questions.length) {
+      state.index += 1;
+      state.activeIsFollowUp = false;
+      state.activeQuestion = null;
       renderQuestion();
       window.scrollTo({ top: 0, behavior: "smooth" });
       document.getElementById("question-title").focus();
@@ -268,59 +387,49 @@
   }
 
   function renderReport() {
-    const totals = state.answers.reduce(function (sum, item) {
+    const average = Math.round(state.answers.reduce(function (sum, item) {
       return sum + item.feedback.score;
-    }, 0);
-    const average = Math.round(totals / state.answers.length);
-    document.getElementById("report-summary").textContent = "You completed " + state.answers.length + " questions for a " + window.InterviewQuestionBank.roleNames[state.options.role] + " interview. Use this checklist as a guide for your next practice—not as a measure of your potential.";
+    }, 0) / state.answers.length);
+    document.getElementById("report-summary").textContent =
+      "You completed " + state.answers.length + " AI-evaluated answers for a "
+      + ROLE_NAMES[state.options.role] + " interview. The session score averages Gemini's evaluation scores.";
     document.getElementById("score-value").textContent = average;
-    const dimensions = [
-      { label: "Answer development", key: "detail", max: 30 },
-      { label: "Specific evidence", key: "evidence", max: 25 },
-      { label: "Structure", key: "structure", max: 25 },
-      { label: "Outcome / takeaway", key: "outcome", max: 20 }
+    const scores = state.answers.map(function (item) { return item.feedback.score; });
+    const metrics = [
+      { label: "AI-evaluated answers", value: String(state.answers.length) },
+      { label: "Highest answer score", value: Math.max.apply(null, scores) + " / 100" },
+      { label: "Lowest answer score", value: Math.min.apply(null, scores) + " / 100" },
+      { label: "Personalized follow-ups", value: String(state.answers.filter(function (item) {
+        return item.isFollowUp;
+      }).length) }
     ];
-    const sums = { detail: 0, evidence: 0, structure: 0, outcome: 0 };
-    state.answers.forEach(function (item) {
-      const feedback = item.feedback;
-      sums.detail += Math.round(Math.min(feedback.wordCount / (item.question.category === "behavioral" ? 100 : 85), 1) * 30);
-      const exampleScore = Math.min((item.answer.match(/\b\d+(?:\.\d+)?%?\b/g) || []).length / 2, 1);
-      const signals = feedback.signals.length;
-      sums.evidence += Math.round(Math.max((signals / (item.question.category === "behavioral" ? 4 : 3)) * 17, exampleScore * 25));
-      sums.structure += Math.round((signals / (item.question.category === "behavioral" ? 4 : 3)) * 25);
-      sums.outcome += Math.round(Math.max((item.question.category === "behavioral" ? Number(feedback.signals.indexOf("Result") >= 0) * 12 : Number(signals >= 3) * 12), exampleScore * 20));
-    });
     document.getElementById("score-breakdown").replaceChildren.apply(
       document.getElementById("score-breakdown"),
-      dimensions.map(function (dimension) {
-        const value = Math.round(sums[dimension.key] / state.answers.length);
+      metrics.map(function (metric) {
         const row = document.createElement("div");
         row.className = "score-item";
         const label = document.createElement("span");
-        label.textContent = dimension.label;
-        const score = document.createElement("strong");
-        score.textContent = value + " / " + dimension.max;
-        row.append(label, score);
+        label.textContent = metric.label;
+        const value = document.createElement("strong");
+        value.textContent = metric.value;
+        row.append(label, value);
         return row;
       })
     );
     const strengthCounts = countFeedback("strengths");
-    const gapCounts = countFeedback("gaps");
-    const strongest = topItems(strengthCounts, 3, ["You completed every question in your practice session."]);
-    const growth = topItems(gapCounts, 3, ["Keep practicing with clear examples and specific details."]);
-    setList("report-strengths", strongest);
-    setList("report-improvements", growth);
+    const growthCounts = countFeedback("weaknesses");
+    const conceptCounts = countFeedback("missing_concepts");
+    Object.keys(conceptCounts).forEach(function (concept) {
+      growthCounts[concept] = (growthCounts[concept] || 0) + conceptCounts[concept];
+    });
+    setList("report-strengths", topItems(strengthCounts, 3), "Gemini did not identify recurring strengths.");
+    setList("report-improvements", topItems(growthCounts, 3), "Gemini did not identify recurring improvement areas.");
     const topics = [];
     state.answers.forEach(function (item) {
-      if (growth.some(function (gap) { return item.feedback.gaps.indexOf(gap) >= 0; }) && topics.indexOf(item.question.topic) < 0) {
-        topics.push(item.question.topic);
-      }
+      if (item.question.topic && topics.indexOf(item.question.topic) < 0) topics.push(item.question.topic);
     });
-    if (topics.length === 0) {
-      topics.push(state.answers[0].question.topic, state.answers[1].question.topic);
-    }
     const topicList = document.getElementById("recommended-topics");
-    topicList.replaceChildren.apply(topicList, topics.slice(0, 3).map(function (topic) {
+    topicList.replaceChildren.apply(topicList, topics.slice(0, 5).map(function (topic) {
       const chip = document.createElement("span");
       chip.className = "topic-chip";
       chip.textContent = topic;
@@ -338,16 +447,16 @@
     return counts;
   }
 
-  function topItems(counts, limit, fallback) {
-    const entries = Object.keys(counts).sort(function (left, right) {
+  function topItems(counts, limit) {
+    return Object.keys(counts).sort(function (left, right) {
       return counts[right] - counts[left];
     }).slice(0, limit);
-    return entries.length ? entries : fallback;
   }
 
-  function setList(id, values) {
+  function setList(id, values, emptyMessage) {
     const list = document.getElementById(id);
-    list.replaceChildren.apply(list, values.map(createListItem));
+    const items = values.length ? values : (emptyMessage ? [emptyMessage] : []);
+    list.replaceChildren.apply(list, items.map(createListItem));
   }
 
   function createListItem(text) {
@@ -369,13 +478,6 @@
     };
     return labels[value] || labels.student;
   }
-
-  document.querySelector(".honesty-note p").textContent =
-    "Gemini provides interview-practice feedback. Your answers are sent to the feedback service during practice and are not saved by this demo.";
-  document.querySelector(".privacy-caption").textContent =
-    "Your answer is sent to Gemini for feedback.";
-  document.querySelector(".rubric-details p").textContent =
-    "The score uses a simple checklist: answer development (0–30), relevant specifics or evidence (0–25), clear structure (0–25), and a useful outcome or takeaway (0–20). This score is deterministic demo feedback. Your strengths, improvements, and sample improved answer are generated by Gemini for practice—not as a hiring assessment or prediction of interview success.";
 
   showView("landing");
 }());

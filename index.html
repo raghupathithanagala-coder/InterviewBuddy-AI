@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f7f8fc">
     <meta name="description" content="Practice job interviews with structured questions and clear, honest feedback.">
+    <meta name="api-base-url" content="">
     <title>InterviewBuddy AI — Practice with purpose</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="js/question-bank.js" defer></script>
-    <script src="js/feedback.js" defer></script>
     <script src="js/app.js" defer></script>
   </head>
   <body>
@@ -37,7 +36,7 @@
               <button class="button button-primary" type="button" data-action="dashboard">Start practicing <span aria-hidden="true">→</span></button>
               <a class="text-link" href="#how-it-works" data-action="how-it-works">See how it works <span aria-hidden="true">↓</span></a>
             </div>
-            <div class="hero-note"><span class="check-icon" aria-hidden="true">✓</span> Free to try <span class="note-divider">·</span> No account needed <span class="note-divider">·</span> Private by design</div>
+            <div class="hero-note"><span class="check-icon" aria-hidden="true">✓</span> No account needed <span class="note-divider">·</span> Gemini-powered <span class="note-divider">·</span> Answers not saved by this app</div>
           </div>
           <div class="hero-visual" aria-label="A preview of a practice interview question">
             <div class="visual-orbit orbit-one"></div>
@@ -63,7 +62,7 @@
           <div class="steps-grid">
             <article class="step-card"><span class="step-number">01</span><div class="step-icon icon-lilac" aria-hidden="true">⌘</div><h3>Make it yours</h3><p>Choose a role, experience level, interview style, and difficulty.</p></article>
             <article class="step-card"><span class="step-number">02</span><div class="step-icon icon-peach" aria-hidden="true">✎</div><h3>Work through questions</h3><p>Answer one relevant prompt at a time, at your own pace.</p></article>
-            <article class="step-card"><span class="step-number">03</span><div class="step-icon icon-mint" aria-hidden="true">↗</div><h3>Leave with a next step</h3><p>Get transparent demo feedback and a focused practice plan.</p></article>
+            <article class="step-card"><span class="step-number">03</span><div class="step-icon icon-mint" aria-hidden="true">↗</div><h3>Leave with a next step</h3><p>Get specific AI feedback, a personal follow-up, and a clear practice summary.</p></article>
           </div>
         </section>
       </section>
@@ -72,22 +71,22 @@
         <div class="app-container dashboard-container">
           <button class="back-link" type="button" data-action="home"><span aria-hidden="true">←</span> Home</button>
           <div class="dashboard-heading">
-            <div><span class="eyebrow">YOUR PRACTICE SPACE</span><h1 id="dashboard-title" tabindex="-1">A little practice goes a long way.</h1><p>Choose a session to get started. No pressure—just progress.</p></div>
+            <div><span class="eyebrow">YOUR PRACTICE SPACE</span><h1 id="dashboard-title" tabindex="-1">A little practice goes a long way.</h1><p>Choose a role and build confidence one AI-guided answer at a time.</p></div>
             <div class="dashboard-stamp" aria-hidden="true"><span>✳</span></div>
           </div>
           <div class="session-cards">
             <article class="session-card session-card-featured">
               <div class="session-card-top"><span class="session-icon session-icon-purple" aria-hidden="true">✧</span><span class="session-tag">A GOOD PLACE TO START</span></div>
-              <h2>Start an interview</h2><p>Build a session around your next opportunity. Choose your role, interview type, and challenge level.</p>
+              <h2>Start an interview</h2><p>Get original Gemini-generated questions and honest, detailed feedback for your chosen role.</p>
               <button class="button button-primary" type="button" data-action="start-interview">Set up my interview <span aria-hidden="true">→</span></button>
             </article>
             <article class="session-card">
               <div class="session-card-top"><span class="session-icon session-icon-orange" aria-hidden="true">✎</span><span class="session-tag">FOCUSED PRACTICE</span></div>
-              <h2>Practice a skill</h2><p>Get comfortable with behavioral questions and learn to tell clearer stories with the STAR framework.</p>
+              <h2>Build your confidence</h2><p>Start with a welcoming warm-up, then gradually work toward more challenging interview questions.</p>
               <button class="button button-secondary" type="button" data-action="practice">Practice behavioral <span aria-hidden="true">→</span></button>
             </article>
           </div>
-          <aside class="honesty-note"><span class="honesty-icon" aria-hidden="true">i</span><p><strong>Honest feedback, by design.</strong> This demo uses a transparent checklist—not an AI model. Your answers stay in this browser session and are not sent anywhere.</p></aside>
+          <aside class="honesty-note"><span class="honesty-icon" aria-hidden="true">i</span><p><strong>Honest feedback, by design.</strong> Questions and answer evaluations come from Gemini. Your answers are sent to the configured backend and are not saved by this app.</p></aside>
         </div>
       </section>
 
@@ -96,7 +95,7 @@
           <button class="back-link" type="button" data-action="dashboard"><span aria-hidden="true">←</span> Back to practice</button>
           <div class="setup-heading"><span class="eyebrow">LET'S MAKE THIS RELEVANT</span><h1 id="setup-title" tabindex="-1">Set up your interview.</h1><p>Pick the options that feel closest to your next interview.</p></div>
           <form class="setup-card" id="setup-form">
-            <label class="field"><span>Job role</span><select name="role" required><option value="software">Software engineer</option><option value="data">Data analyst</option><option value="product">Product manager</option><option value="customer">Customer support</option></select></label>
+            <label class="field"><span>Job role</span><select name="role" required><option value="software">Software Developer</option><option value="web">Web Developer</option><option value="data">Data Analyst</option><option value="ai_ml">AI/ML Engineer</option><option value="electronics">Electronics Engineer</option><option value="embedded">Embedded Systems Engineer</option><option value="communications">Communication Engineer</option><option value="hr">HR/Behavioral Interview</option></select></label>
             <label class="field"><span>Experience level</span><select name="experience" required><option value="student">Student / recent graduate</option><option value="entry">Early career (1–3 years)</option><option value="experienced">Experienced (4+ years)</option></select></label>
             <fieldset class="field fieldset"><legend>Interview type</legend><div class="choice-grid">
               <label class="choice-card"><input type="radio" name="type" value="mixed" checked><span class="choice-content"><span class="choice-emoji" aria-hidden="true">◈</span><strong>Mixed</strong><small>A bit of everything</small></span></label>
@@ -105,8 +104,8 @@
             </div></fieldset>
             <label class="field"><span>Difficulty</span><select name="difficulty" required><option value="friendly">Warm-up</option><option value="standard" selected>Interview-ready</option><option value="challenging">Stretch yourself</option></select></label>
             <p class="form-error" id="setup-error" role="alert" hidden></p>
-            <button class="button button-primary button-full" type="submit">Build my practice session <span aria-hidden="true">→</span></button>
-            <p class="form-footnote">About 5 questions · Take a break whenever you need</p>
+            <button class="button button-primary button-full" id="build-session" type="submit">Generate AI questions <span aria-hidden="true">→</span></button>
+            <p class="form-footnote">Five Gemini-generated questions · starts gently and builds confidence</p>
           </form>
         </div>
       </section>
@@ -126,14 +125,22 @@
               <textarea id="answer-input" name="answer" rows="8" placeholder="Take a moment to think, then write your answer here..." required></textarea>
               <div class="answer-footer"><span id="answer-counter">0 characters</span><span>Tip: specific examples make stronger answers.</span></div>
               <p class="form-error" id="answer-error" role="alert" hidden></p>
-              <div class="answer-actions"><button class="button button-primary" id="submit-answer" type="submit">Get feedback <span aria-hidden="true">→</span></button><span class="privacy-caption"><span aria-hidden="true">🔒</span> Your answer stays on this device</span></div>
+              <div class="answer-actions"><button class="button button-primary" id="submit-answer" type="submit">Get AI feedback <span aria-hidden="true">→</span></button><span class="privacy-caption"><span aria-hidden="true">🔒</span> Sent to Gemini for evaluation</span></div>
             </form>
           </div>
           <section class="feedback-card" id="feedback-panel" hidden aria-live="polite" aria-labelledby="feedback-title">
-            <div class="feedback-heading"><span class="feedback-badge" aria-hidden="true">✦</span><div><h2 id="feedback-title">A few thoughts on your answer</h2><p>Checklist-based demo feedback · Not AI-generated</p></div></div>
-            <div class="feedback-grid"><div><h3>What’s working</h3><ul id="feedback-strengths"></ul></div><div><h3>Consider adding</h3><ul id="feedback-gaps"></ul></div></div>
-            <div class="improve-box"><strong>Try this next</strong><p id="feedback-suggestion"></p></div>
-            <div class="feedback-actions"><button class="button button-outline" type="button" data-action="retry-answer">Try this answer again</button><button class="button button-primary" id="continue-button" type="button">Continue <span aria-hidden="true">→</span></button></div>
+            <div class="feedback-heading"><span class="feedback-badge" aria-hidden="true">✦</span><div><h2 id="feedback-title">Your AI interview evaluation</h2><p>Gemini-generated coaching · for practice, not hiring decisions</p></div><strong id="answer-score" aria-label="AI evaluation score"></strong></div>
+            <div class="feedback-grid">
+              <div><h3>Strengths</h3><ul id="feedback-strengths"></ul></div>
+              <div><h3>Specific weaknesses</h3><ul id="feedback-weaknesses"></ul></div>
+              <div><h3>Missing concepts</h3><ul id="feedback-missing"></ul></div>
+              <div><h3>Grammar suggestions</h3><ul id="feedback-grammar"></ul></div>
+              <div><h3>Clarity</h3><p id="feedback-clarity"></p></div>
+              <div><h3>Relevance</h3><p id="feedback-relevance"></p></div>
+            </div>
+            <div class="improve-box"><strong>Improved example answer</strong><p id="feedback-improved"></p></div>
+            <div class="improve-box" id="follow-up-box"><strong>Personalized follow-up question</strong><p id="follow-up-question"></p></div>
+            <div class="feedback-actions"><button class="button button-outline" type="button" data-action="retry-answer">Try this answer again</button><button class="button button-outline" id="answer-follow-up" type="button">Answer follow-up</button><button class="button button-primary" id="continue-button" type="button">Continue <span aria-hidden="true">→</span></button></div>
           </section>
         </div>
       </section>
@@ -141,10 +148,10 @@
       <section class="view app-view" id="report-view" hidden aria-labelledby="report-title">
         <div class="app-container report-container">
           <div class="report-hero"><span class="report-check" aria-hidden="true">✓</span><span class="eyebrow">PRACTICE SESSION COMPLETE</span><h1 id="report-title" tabindex="-1">You showed up. That counts.</h1><p id="report-summary"></p></div>
-          <div class="report-score-card"><div class="score-display"><span class="score-label">DEMO RUBRIC SCORE</span><div><strong id="score-value">0</strong><span class="score-out-of">/ 100</span></div><span class="score-caption">A practice guide, not a hiring prediction</span></div><div class="score-breakdown" id="score-breakdown"></div></div>
+          <div class="report-score-card"><div class="score-display"><span class="score-label">AVERAGE AI EVALUATION</span><div><strong id="score-value">0</strong><span class="score-out-of">/ 100</span></div><span class="score-caption">AI-generated practice guidance, not a hiring prediction</span></div><div class="score-breakdown" id="score-breakdown"></div></div>
           <div class="report-columns"><section class="report-panel"><h2>Your strengths</h2><ul id="report-strengths"></ul></section><section class="report-panel"><h2>Room to grow</h2><ul id="report-improvements"></ul></section></div>
           <section class="report-panel next-steps-panel"><span class="eyebrow">YOUR NEXT PRACTICE</span><h2>Keep the momentum going.</h2><div id="recommended-topics" class="topic-list"></div></section>
-          <details class="rubric-details"><summary>How is this score calculated?</summary><p>Each answer is reviewed using the same simple checklist: answer development (0–30), relevant specifics or evidence (0–25), clear structure (0–25), and a useful outcome or takeaway (0–20). Behavioral answers are checked for Situation, Task, Action, and Result. Technical answers are checked for problem understanding, approach, and trade-offs. This is deterministic demo feedback—not AI, a hiring assessment, or a prediction of interview success.</p></details>
+          <details class="rubric-details"><summary>How should I understand this score?</summary><p>Gemini evaluates each answer for correctness, completeness, role relevance, evidence, and clear communication. The session score is the average of those AI-generated scores. Use it as practice guidance, not as a hiring assessment or prediction. AI feedback can be imperfect; verify technical guidance independently.</p></details>
           <div class="report-actions"><button class="button button-primary" type="button" data-action="retry-interview">Practice these questions again <span aria-hidden="true">↻</span></button><button class="button button-outline" type="button" data-action="dashboard">Back to practice</button></div>
         </div>
       </section>
