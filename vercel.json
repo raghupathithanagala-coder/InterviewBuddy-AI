@@ -5,12 +5,36 @@
     {
       "src": "js/app.py",
       "use": "@vercel/python"
+    },
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "styles.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/app.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/feedback.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/question-bank.js",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/api/(.*)",
       "dest": "js/app.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "index.html"
     }
   ]
 }
