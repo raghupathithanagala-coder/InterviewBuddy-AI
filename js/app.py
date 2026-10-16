@@ -129,7 +129,7 @@ def _generate_json(prompt, schema):
     if not api_key:
         raise RuntimeError("MISSING_API_KEY")
 
-    model = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
+    model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
     client = genai.Client(api_key=api_key)
     for attempt in range(3):
         try:
